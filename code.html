@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        .landing-page {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .landing-title {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .start-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .start-button:hover {
+            background-color: #555;
+        }
+
+        .second-page {
+            display: none;
+        }
+
+        #game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        #choices-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .choice {
+            cursor: pointer;
+            transition: transform 0.3s;
+            margin: 0 10px;
+        }
+
+        .choice:hover {
+            transform: scale(1.1);
+        }
+
+        #result {
+            margin-top: 30px;
+            font-size: 24px;
+        }
+
+        #score {
+            margin-top: 30px;
+            font-size: 20px;
+        }
+
+        .scoreboard {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .score-label {
+            margin-right: 10px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="landing-page">
+        <h1 class="landing-title">Rock Paper Scissors</h1>
+        <button class="start-button" onclick="startGame()">Start</button>
+    </div>
+    <div class="second-page">
+        <h1 id="game-title"></h1>
+        <div id="game-container">
+            <h3 id="result"></h3>
+            <p id="choices-text"></p>
+        </div>
+        <div id="scoreboard">
+            <p id="score-text" class="scoreboard">
+                <span class="score-label">Score:</span>
+                <span id="win-count">0</span> wins,
+                <span id="lose-count">0</span> loses,
+                <span id="tie-count">0</span> ties
+            </p>
+        </div>
+        <div id="choices-container"></div>
+        <button onclick="resetScore()">Reset Score</button>
+    </div>
+
+    <script>
+        const choices = ["rock", "paper", "scissors"];
+        let userChoice = null;
+        let computerChoice = null;
+        let userScore = 0;
+        let computerScore = 0;
+        let tieScore = 0;
+
+        const landingPage = document.querySelector('.landing-page');
+        const secondPage = document.querySelector('.second-page');
+        const gameTitleElement = document.getElementById('game-title');
+        const resultElement = document.getElementById('result');
+        const choicesContainer = document.getElementById('choices-container');
+        const choicesTextElement = document.getElementById('choices-text');
+        const winCountElement = document.getElementById('win-count');
+        const loseCountElement = document.getElementById('lose-count');
+        const tieCountElement = document.getElementById('tie-count');
+
+        function startGame() {
+            landingPage.style.display = 'none';
+            secondPage.style.display = 'block';
+            gameTitleElement.textContent = "Rock Paper Scissors";
+
+            renderChoices();
+        }
+
+        function renderChoices() {
+            choicesContainer.innerHTML = "";
+
+            choices.forEach(choice => {
+                const choiceElement = document.createElement('div');
+                choiceElement.className = "choice";
+                choiceElement.id = choice;
+                choiceElement.addEventListener('click', () => {
+                    if (!userChoice) {
+                        userChoice = choice;
+                        playGame();
+                    }
+                });
+
+                const choiceImage = document.createElement('img');
+                choiceImage.src = choice + ".png";
+                choiceImage.alt = choice.charAt(0).toUpperCase() + choice.slice(1);
+                choiceImage.width = 100;
+
+                choiceElement.appendChild(choiceImage);
+                choicesContainer.appendChild(choiceElement);
+            });
+        }
+
+        function playGame() {
+            const randomIndex = Math.floor(Math.random() * 3);
+            computerChoice = choices[randomIndex];
+
+            displayChoices();
+
+            if (userChoice === computerChoice) {
+                displayResult("It's a tie!");
+                tieScore++;
+            } else if (
+                (userChoice === "rock" && computerChoice === "scissors") ||
+                (userChoice === "paper" && computerChoice === "rock") ||
+                (userChoice === "scissors" && computerChoice === "paper")
+            ) {
+                displayResult("You win!");
+                userScore++;
+            } else {
+                displayResult("You lose!");
+                computerScore++;
+            }
+
+            updateScore();
+
+            // Reset user choice for the next round
+            userChoice = null;
+        }
+
+        function displayChoices() {
+            const userChoiceElement = document.createElement('span');
+            userChoiceElement.textContent = "You: ";
+            choicesTextElement.innerHTML = "";
+            choicesTextElement.appendChild(userChoiceElement);
+
+            const userChoiceImage = document.createElement('img');
+            userChoiceImage.src = userChoice + ".png";
+            userChoiceImage.alt = userChoice.charAt(0).toUpperCase() + userChoice.slice(1);
+            userChoiceImage.width = 100;
+
+            choicesTextElement.appendChild(userChoiceImage);
+
+            const computerChoiceElement = document.createElement('span');
+            computerChoiceElement.textContent = " Computer: ";
+
+            choicesTextElement.appendChild(computerChoiceElement);
+
+            const computerChoiceImage = document.createElement('img');
+            computerChoiceImage.src = computerChoice + ".png";
+            computerChoiceImage.alt = computerChoice.charAt(0).toUpperCase() + computerChoice.slice(1);
+            computerChoiceImage.width = 100;
+
+            choicesTextElement.appendChild(computerChoiceImage);
+        }
+
+        function displayResult(result) {
+            resultElement.textContent = result;
+        }
+
+        function updateScore() {
+            winCountElement.textContent = userScore;
+            loseCountElement.textContent = computerScore;
+            tieCountElement.textContent = tieScore;
+        }
+
+        function resetScore() {
+            userScore = 0;
+            computerScore = 0;
+            tieScore = 0;
+            updateScore();
+        }
+    </script>
+</body>
+</html>
